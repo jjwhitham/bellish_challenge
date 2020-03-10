@@ -8,9 +8,9 @@ function SketchItems(props) {
   const SketchButtons = [...Array(totalSketches).keys()].map(sketchNumber => {
     const text = "Sketch #" + (sketchNumber + 1);
     let isCurrentSketch = sketchNumber === currentSketchNum;
-    let style = {};
+    let style = { margin: "auto", display: "block" };
     if (isCurrentSketch) {
-      style = { background: "grey", color: "white" };
+      style = {...style, background: "grey", color: "white" };
     }
     return (
       <button

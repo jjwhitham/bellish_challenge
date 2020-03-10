@@ -2,7 +2,7 @@ import React, { Component } from "react";
 // Sketching area component.
 export class SketchDrawing extends Component {
   state = {
-    paths: [null]
+    paths: []
   };
 
   // Saves state onMouseUp
@@ -20,7 +20,7 @@ export class SketchDrawing extends Component {
     const canvas = this.refs.canvas;
     const context = canvas.getContext("2d");
     context.fillStyle = "white";
-    context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    context.fillRect(0, 0, window.innerWidth - 130, window.innerHeight);
   }
 
   // Initialises a new drawing, or loads an existing drawing
@@ -30,7 +30,7 @@ export class SketchDrawing extends Component {
     const handleMouseUp = this.handleMouseUp;
     const currentSketchNum = this.props.currentSketchNum;
     const newDrawing = currentSketchNum >= this.state.paths.length;
-    const paths = this.state.paths.slice();
+    // const paths = this.state.paths.slice();
 
     let path = new Path2D();
     let isDrawing = false;
@@ -39,11 +39,11 @@ export class SketchDrawing extends Component {
     context.lineWidth = 5;
 
     // Creates a new Path2D object for a new drawing, or loads an existing drawing
-    if (newDrawing) {
-      this.setState({
-        paths: paths.concat([null])
-      });
-    } else {
+    if (!newDrawing) {
+      // this.setState({
+      //   paths: paths.concat([null])
+      // });
+    // } else {
       const oldPath = this.state.paths[currentSketchNum];
       path = new Path2D(oldPath);
       context.stroke(path);
@@ -86,6 +86,7 @@ export class SketchDrawing extends Component {
   componentDidMount = () => {
     this.initCanvas();
   }
+  
   // When the current sketch changes, wipe the canvas and
   // either start fresh, or load existing drawing
   componentDidUpdate = prevProps => {
@@ -100,8 +101,8 @@ export class SketchDrawing extends Component {
       <div>
         <canvas
           ref="canvas"
-          width={window.innerWidth}
-          height={window.innerHeight}
+          width={window.innerWidth - 130}
+          height={window.innerHeight - 30}
         />
       </div>
     );
