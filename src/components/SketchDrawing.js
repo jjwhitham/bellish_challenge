@@ -1,36 +1,36 @@
-import React, { Component } from "react";
+import React, { useState, useRef, useEffect } from "react";
+
 // Sketching area component.
-export class SketchDrawing extends Component {
-  state = {
-    paths: []
-  };
+function SketchDrawing(props) {
+  const [paths, setPaths] = useState([]);
+  const canvasRef = useRef();
+
+  // Constrain canvas dimensions
+  const btnsFlexContainerWidth = 130;
+  const browserHeaderHeight = 30;
 
   // Saves state onMouseUp
-  handleMouseUp = path => {
-    const currentSketchNum = this.props.currentSketchNum;
-    const updatedPaths = this.state.paths.slice();
+  const handleMouseUp = path => {
+    const currentSketchNum = props.currentSketchNum;
+    const updatedPaths = paths.slice();
     updatedPaths[currentSketchNum] = new Path2D(path);
-    this.setState({
-      paths: updatedPaths
-    });
+    setPaths(updatedPaths);
   };
 
   // Clears the canvas of paths
-  cleanupCanvas = () => {
-    const canvas = this.refs.canvas;
+  const cleanupCanvas = () => {
+    const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     context.fillStyle = "white";
-    context.fillRect(0, 0, window.innerWidth - 130, window.innerHeight);
-  }
+    context.fillRect(0, 0, window.innerWidth - btnsFlexContainerWidth, window.innerHeight - browserHeaderHeight);
+  };
 
   // Initialises a new drawing, or loads an existing drawing
-  initCanvas = () => {
-    const canvas = this.refs.canvas;
+  const initCanvas = () => {
+    const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-    const handleMouseUp = this.handleMouseUp;
-    const currentSketchNum = this.props.currentSketchNum;
-    const newDrawing = currentSketchNum >= this.state.paths.length;
-    // const paths = this.state.paths.slice();
+    const currentSketchNum = props.currentSketchNum;
+    const newDrawing = currentSketchNum >= paths.length;
 
     let path = new Path2D();
     let isDrawing = false;
@@ -38,13 +38,9 @@ export class SketchDrawing extends Component {
     context.strokeStyle = "orange";
     context.lineWidth = 5;
 
-    // Creates a new Path2D object for a new drawing, or loads an existing drawing
+    // Loads an existing drawing
     if (!newDrawing) {
-      // this.setState({
-      //   paths: paths.concat([null])
-      // });
-    // } else {
-      const oldPath = this.state.paths[currentSketchNum];
+      const oldPath = paths[currentSketchNum];
       path = new Path2D(oldPath);
       context.stroke(path);
     }
@@ -80,33 +76,30 @@ export class SketchDrawing extends Component {
       isDrawing = false;
       handleMouseUp(path);
     };
-  }
+  };
 
-  // Initialises new drawing on component mount
-  componentDidMount = () => {
-    this.initCanvas();
-  }
+  // useEffect replaces previously used lifecycle methods, implementing
+  // the same functionality, namely:
+  // componentDidMount():
+  //    Initialises new drawing on component mount
+  // componentWillUpdate():
+  //    When the current sketch changes, wipe the canvas and
+  //    either start fresh for a new drawing, or load existing drawing
+  useEffect(() => {
+    cleanupCanvas();
+    initCanvas();
+  });
+
   
-  // When the current sketch changes, wipe the canvas and
-  // either start fresh, or load existing drawing
-  componentDidUpdate = prevProps => {
-    if (prevProps.currentSketchNum !== this.props.currentSketchNum) {
-      this.cleanupCanvas();
-      this.initCanvas();
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        <canvas
-          ref="canvas"
-          width={window.innerWidth - 130}
-          height={window.innerHeight - 30}
-        />
-      </div>
-    );
-  }
+  return (
+    <div>
+      <canvas
+        ref={canvasRef}
+        width={window.innerWidth - btnsFlexContainerWidth}
+        height={window.innerHeight - browserHeaderHeight}
+      />
+    </div>
+  );
 }
 
 export default SketchDrawing;

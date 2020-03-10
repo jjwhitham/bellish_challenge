@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import SketchItems from "./components/SketchItems";
 import SketchDrawing from "./components/SketchDrawing";
 import "./App.css";
 
-// App is the main SketchBook component and.
+// App is the main SketchBook component.
 
 // If extending this application to incorporate server-side syncing
 // we might like to lean on a requests library, like Axios, for making
@@ -25,63 +25,49 @@ import "./App.css";
 // POST requests to store their sketches. A 'save sketch' button could be added,
 // which would trigger a POST request for a new sketch, or a PUT request for an
 // existing sketch upon clicking save.
-class App extends Component {
-  state = {
-    currentSketchNum: 0,
-    totalSketches: 1
-  };
+function App() {
+  let [currentSketchNum, setCurrentSketchNum] = useState(0);
+  let [totalSketches, setTotalSketches] = useState(1);
 
   // Set the current sketch number
-  goToSketch = sketchNum => {
-    this.setState({
-      currentSketchNum: sketchNum
-    });
+  const goToSketch = sketchNum => {
+    setCurrentSketchNum(sketchNum);
   };
 
   // When adding a new sketch, update the total and go to new sketch
-  handleNewSketch = () => {
-    console.log("handle new sketch being called...");
-    let totalSketches = this.state.totalSketches;
-
-    this.goToSketch(totalSketches);
+  const handleNewSketch = () => {
+    goToSketch(totalSketches);
     totalSketches += 1;
-    this.setState({
-      totalSketches: totalSketches
-    });
+    setTotalSketches(totalSketches);
   };
 
   // Jump to a different existing sketch
-  handleChangeSketch = sketchNum => {
-    if (sketchNum === this.state.currentSketchNum) {
+  const handleChangeSketch = sketchNum => {
+    if (sketchNum === currentSketchNum) {
       return;
     }
-    this.goToSketch(sketchNum);
+    goToSketch(sketchNum);
   };
 
-  render() {
-    return (
-      <div className="App">
-        <div className="button-flex-container">
-          <button
-            style={{display: "block" }}
-            onClick={this.handleNewSketch}
-          >
-            + Add New Sketch
-          </button>
-          <div id="sketch-items" style={{ paddingTop: "20px" }}>
-            <SketchItems
-              handleChangeSketch={i => this.handleChangeSketch(i)}
-              currentSketchNum={this.state.currentSketchNum}
-              totalSketches={this.state.totalSketches}
-            />
-          </div>
-        </div>
-        <div id="sketch-drawing">
-          <SketchDrawing currentSketchNum={this.state.currentSketchNum} />
+  return (
+    <div className="App">
+      <div className="button-flex-container">
+        <button style={{ display: "block" }} onClick={handleNewSketch}>
+          + Add New Sketch
+        </button>
+        <div id="sketch-items" style={{ paddingTop: "20px" }}>
+          <SketchItems
+            handleChangeSketch={i => handleChangeSketch(i)}
+            currentSketchNum={currentSketchNum}
+            totalSketches={totalSketches}
+          />
         </div>
       </div>
-    );
-  }
+      <div id="sketch-drawing">
+        <SketchDrawing currentSketchNum={currentSketchNum} />
+      </div>
+    </div>
+  );
 }
 
 export default App;
